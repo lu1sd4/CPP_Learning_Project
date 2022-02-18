@@ -6,33 +6,280 @@ Compilez et lancez le programme.
 
 Allez dans le fichier `tower_sim.cpp` et recherchez la fonction responsable de gérer les inputs du programme.
 Sur quelle touche faut-il appuyer pour ajouter un avion ?
+
+<hr />
+C
+<hr />
+
 Comment faire pour quitter le programme ?
+
+<hr />
+x ou q
+<hr />
+
 A quoi sert la touche 'F' ?
+
+<hr />
+toggle_fullscreen
+<hr />
 
 Ajoutez un avion à la simulation et attendez.
 Que est le comportement de l'avion ?
+
+<hr />
+l'avion atterrit, puis il est desservi, puis il repart 
+<hr />
+
 Quelles informations s'affichent dans la console ?
+
+<hr />
+
+```
+LH1778 is now landing...
+now servicing DL2186...
+done servicing DL2186
+DL2186 lift off
+```
+
+<hr />
 
 Ajoutez maintenant quatre avions d'un coup dans la simulation.
 Que fait chacun des avions ?
 
+<hr />
+la même chose
+<hr />
+
 ## B- Analyse du code
 
 Listez les classes du programme à la racine du dossier src/.
+
+<hr />
+
+- Aircraft
+- AircraftType
+- Airport
+- AirportType
+- Terminal
+- Tower
+- TowerSimulation
+- Point2D
+- Point3D
+- Runway
+- Waypoint
+
+<hr />
+
 Pour chacune d'entre elle, expliquez ce qu'elle représente et son rôle dans le programme.
 
+<hr />
+
+| classe        | représentation                                                                                  |
+|---------------|-------------------------------------------------------------------------------------------------|
+| aircraft_type | représente les différents types d'avions, permets de stocker les informations propre à un avion |
+| aircraft      | représente les à proprement parler un avion ainsi que ses actions                               | 
+| airport_type  | représente les informations d'un aéroports                                                      |
+| airport       | représente à proprement parler un aéroport                                                      |
+| geometry      | représente les actions possible sur les géométrie du projet                                     |
+| main          | permet de lancer la simulation                                                                  |
+| runaway       | représente le point dans l'espace qui indique aux avions qu'ils se sont éloignés de l'aéroport  |
+| terminal      | représente les terminaux de l'aéroport, permets aux avions de récupérer des passagers           |
+| tower_sim     | gère toute la simulations ainsi que les inputs de l'utilisateur                                 |
+| tower         | représente les tours de controle                                                                |
+| waypoint      | représente un point sur le chemin d'un avion                                                    |
+
+<hr />
+
 Pour les classes `Tower`, `Aircaft`, `Airport` et `Terminal`, listez leurs fonctions-membre publiques et expliquez précisément à quoi elles servent.
-Réalisez ensuite un schéma présentant comment ces différentes classes intéragissent ensemble.
+
+- Tower
+
+```cpp
+public:
+  Tower(Airport& airport_) : airport { airport_ } {}
+  // produce instructions for aircraft
+  WaypointQueue get_instructions(Aircraft& aircraft);
+  void arrived_at_terminal(const Aircraft& aircraft);
+```
+
+- constructeur
+- genère une liste de points qui répresentent le chemin qu'un avion doit suivre
+- démarre le service d'un avion
+
+- Aircraft
+
+```cpp
+public:
+    Aircraft(const AircraftType& type_, const std::string_view& flight_number_, const Point3D& pos_,
+             const Point3D& speed_, Tower& control_) :
+        GL::Displayable { pos_.x() + pos_.y() },
+        type { type_ },
+        flight_number { flight_number_ },
+        pos { pos_ },
+        speed { speed_ },
+        control { control_ }
+    {
+        speed.cap_length(max_speed());
+    }
+
+    const std::string& get_flight_num() const { return flight_number; }
+    float distance_to(const Point3D& p) const { return pos.distance_to(p); }
+
+    void display() const override;
+    void move() override;
+
+    friend class Tower;
+```
+
+- constructeur
+- renvoie le numero du vol
+- renvoie la distance entre l'avion et un point donné
+- dessine l'avion autour du point ou il est placé
+- déplace l'avion vers son prochain waypoint
+
+- Airport
+
+```cpp
+public:
+    Airport(const AirportType& type_, const Point3D& pos_, const img::Image* image, const float z_ = 1.0f) :
+        GL::Displayable { z_ },
+        type { type_ },
+        pos { pos_ },
+        texture { image },
+        terminals { type.create_terminals() },
+        tower { *this }
+    {}
+
+    Tower& get_tower() { return tower; }
+
+    void display() const override { texture.draw(project_2D(pos), { 2.0f, 2.0f }); }
+
+    void move() override
+    {
+        for (auto& t : terminals)
+        {
+            t.move();
+        }
+    }
+
+    friend class Tower;
+```
+
+- constructeur
+- renvoie la tour de contrôle de l'aéroport
+- dessine l'aéroport
+- avance les terminaux de l'aéroport
+
+- Terminal
+
+```cpp
+public:
+    Terminal(const Point3D& pos_) : pos { pos_ } {}
+
+    bool in_use() const { return current_aircraft != nullptr; }
+    bool is_servicing() const { return service_progress < SERVICE_CYCLES; }
+    void assign_craft(const Aircraft& aircraft) { current_aircraft = &aircraft; }
+
+    void start_service(const Aircraft& aircraft)
+    {
+        assert(aircraft.distance_to(pos) < DISTANCE_THRESHOLD);
+        std::cout << "now servicing " << aircraft.get_flight_num() << "...\n";
+        service_progress = 0;
+    }
+
+    void finish_service()
+    {
+        if (!is_servicing())
+        {
+            std::cout << "done servicing " << current_aircraft->get_flight_num() << '\n';
+            current_aircraft = nullptr;
+        }
+    }
+
+    void move() override
+    {
+        if (in_use() && is_servicing())
+        {
+            ++service_progress;
+        }
+    }
+```
+
+- constructeur
+- renvoie vrai si le terminal est occupé par un avion
+- renvoie vrai si le terminal est en train de déservir un avion
+- commence le service d'un avion
+- termine le service d'un avion
+- avance le service d'un avion
+
+<hr />
+
+Réalisez ensuite un schéma présentant comment ces différentes classes interagissent ensemble.
+
+<hr />
+
+> TODO
+
+<hr />
 
 Quelles classes et fonctions sont impliquées dans la génération du chemin d'un avion ?
+
+<hr />
+
+> TODO
+
+<hr />
+
 Quel conteneur de la librairie standard a été choisi pour représenter le chemin ?
+
+<hr />
+
+> TODO
+
+<hr />
+
 Expliquez les intérêts de ce choix.
+
+<hr />
+
+> TODO
+
+<hr />
 
 ## C- Bidouillons !
 
 1) Déterminez à quel endroit du code sont définies les vitesses maximales et accélération de chaque avion.
+
+<hr />
+
+Dans `aircraft_types.hpp` ligne 30
+
+```cpp
+inline void init_aircraft_types()
+{
+    aircraft_types[0] = new AircraftType { .02f, .05f, .02f, MediaPath { "l1011_48px.png" } };
+    aircraft_types[1] = new AircraftType { .02f, .05f, .02f, MediaPath { "b707_jat.png" } };
+    aircraft_types[2] = new AircraftType { .02f, .05f, .02f, MediaPath { "concorde_af.png" } };
+}
+```
+
+<hr />
+
 Le Concorde est censé pouvoir voler plus vite que les autres avions.
 Modifiez le programme pour tenir compte de cela.
+
+<hr />
+
+```cpp
+inline void init_aircraft_types()
+{
+    aircraft_types[0] = new AircraftType { .02f, .05f, .02f, MediaPath { "l1011_48px.png" } };
+    aircraft_types[1] = new AircraftType { .02f, .05f, .02f, MediaPath { "b707_jat.png" } };
+    aircraft_types[2] = new AircraftType { .04f, .1f, .04f, MediaPath { "concorde_af.png" } };
+}
+```
+
+<hr />
 
 2) Identifiez quelle variable contrôle le framerate de la simulation.
 Ajoutez deux nouveaux inputs au programme permettant d'augmenter ou de diminuer cette valeur.
