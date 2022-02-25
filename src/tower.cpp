@@ -46,6 +46,7 @@ WaypointQueue Tower::get_instructions(Aircraft& aircraft)
         Terminal& terminal      = airport.get_terminal(terminal_num);
         if (!terminal.is_servicing())
         {
+            aircraft.has_been_serviced = true;
             terminal.finish_service();
             reserved_terminals.erase(it);
             aircraft.is_at_terminal = false;

@@ -88,10 +88,13 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
     }
 }
 
-void Aircraft::move()
+bool Aircraft::update()
 {
     if (waypoints.empty())
     {
+        if (has_been_serviced) {
+            return false;
+        }
         waypoints = control.get_instructions(*this);
     }
 

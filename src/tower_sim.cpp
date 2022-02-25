@@ -56,7 +56,10 @@ void TowerSimulation::create_keystrokes() const
     GL::keystrokes.emplace('c', [this]() { create_random_aircraft(); });
     GL::keystrokes.emplace('+', []() { GL::change_zoom(0.95f); });
     GL::keystrokes.emplace('-', []() { GL::change_zoom(1.05f); });
+    GL::keystrokes.emplace('>', []() { GL::increase_fps(); });
+    GL::keystrokes.emplace('<', []() { GL::decrease_fps(); });
     GL::keystrokes.emplace('f', []() { GL::toggle_fullscreen(); });
+    GL::keystrokes.emplace('p', []() { GL::toggle_pause(); });
 }
 
 void TowerSimulation::display_help() const

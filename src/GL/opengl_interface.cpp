@@ -36,6 +36,11 @@ void toggle_fullscreen()
     fullscreen = !fullscreen;
 }
 
+void toggle_pause()
+{
+    running = !running;
+}
+
 void change_zoom(const float factor)
 {
     zoom *= factor;
@@ -52,6 +57,16 @@ void reshape_window(int w, int h)
     glLoadIdentity();
     glOrtho(-zoom, zoom, -zoom, zoom, 0.0f, 1.0f); // left, right, bottom, top, near, far
     handle_error("Cannot reshape window");
+}
+
+void increase_fps()
+{
+    ticks_per_sec++;
+}
+
+void decrease_fps()
+{
+    ticks_per_sec--;
 }
 
 void display(void)
@@ -73,9 +88,21 @@ void display(void)
 
 void timer(const int step)
 {
-    for (auto& item : move_queue)
+    if (running)
     {
-        item->move();
+        for (auto it = move_queue.begin(); it != move_queue.end();)
+        {
+            auto* item = *it;
+            if (item->update())
+            {
+                ++it;
+            }
+            else
+            {
+                it = move_queue.erase(it);
+                delete item;
+            }
+        }
     }
     glutPostRedisplay();
     glutTimerFunc(1000u / ticks_per_sec, timer, step + 1);

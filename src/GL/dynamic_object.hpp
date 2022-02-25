@@ -9,7 +9,7 @@ class DynamicObject
 public:
     virtual ~DynamicObject() {}
 
-    virtual void move() = 0;
+    virtual bool update() = 0;
 };
 
 inline std::unordered_set<DynamicObject*> move_queue;
