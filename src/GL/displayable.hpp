@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 
 namespace GL {
 
@@ -14,11 +15,15 @@ protected:
 
 public:
     Displayable(const float z_) : z { z_ } {}
-    virtual ~Displayable() {}
+    virtual ~Displayable() {
+        display_queue.erase(std::find(display_queue.begin(), display_queue.end(), this));
+    }
 
     virtual void display() const = 0;
 
     float get_z() const { return z; }
+
+    static inline std::vector<const Displayable*> display_queue;
 };
 
 struct disp_z_cmp

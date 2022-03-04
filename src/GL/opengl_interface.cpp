@@ -1,4 +1,5 @@
 #include "opengl_interface.hpp"
+#include <algorithm>
 
 namespace GL {
 
@@ -92,7 +93,7 @@ void timer(const int step)
     {
         for (auto it = move_queue.begin(); it != move_queue.end();)
         {
-            auto* item = *it;
+            DynamicObject* item = *it;
             if (item->update())
             {
                 ++it;

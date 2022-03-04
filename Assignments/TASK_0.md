@@ -345,16 +345,33 @@ Ok
 
 Indices :
 - A quel endroit pouvez-vous savoir que l'avion doit être supprimé ?
+
+<hr/>
+
+Dans `src/aircraft.cpp` quand la fonction `Aircraft::update` vérifie si l'avion n'a pas de *waypoints*, si l'avion a été desservi, on peut le retirer de l'application.
+
+<hr/>
+
 - Pourquoi n'est-il pas sûr de procéder au retrait de l'avion dans cette fonction ?
+
+Parce que `update()` est appelée dans une boucle qui itere sur les éléments dynamiques du jeu.
+
 - A quel endroit de la callstack pourriez-vous le faire à la place ?
+
+Dans la boucle `timer` où on parcourt les `DynamicObject`.
+
 - Que devez-vous modifier pour transmettre l'information de la première à la seconde fonction ?
 
+Nous pouvons faire en sorte que la fonction `update` renvoie un booléen, qui indique si l'objet doit être supprimé, mettre à jour les `DynamicObject` de façon à que `update` renvoie `true`, et pour `Aircraft` :
 
+Nous pouvons en ajouter le flag `has_been_serviced`, qui va être mis à jour une fois l'avion a été desservi, et qui va être vérifié dans `Aircraft::update`. Si l'avion n'a pas de waypoints et qu'il a déjà été desservi, `Aircraft::update` renvoie false.
 
 5) Lorsqu'un objet de type `Displayable` est créé, il faut ajouter celui-ci manuellement dans la liste des objets à afficher.
 Il faut également penser à le supprimer de cette liste avant de le détruire.
 Faites en sorte que l'ajout et la suppression de `display_queue` soit "automatiquement gérée" lorsqu'un `Displayable` est créé ou détruit.
 Pourquoi n'est-il pas spécialement pertinent d'en faire de même pour `DynamicObject` ?
+
+
 
 6) La tour de contrôle a besoin de stocker pour tout `Aircraft` le `Terminal` qui lui est actuellement attribué, afin de pouvoir le libérer une fois que l'avion décolle.
 Cette information est actuellement enregistrée dans un `std::vector<std::pair<const Aircraft*, size_t>>` (size_t représentant l'indice du terminal).
