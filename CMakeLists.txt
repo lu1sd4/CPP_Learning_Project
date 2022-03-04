@@ -14,6 +14,8 @@ add_executable(tower
 	src/img/media_path.hpp
 	src/img/stb_image.h
     src/aircraft_types.hpp
+	src/aircraft_manager.cpp
+	src/aircraft_manager.hpp
     src/aircraft.cpp
     src/aircraft.hpp
     src/airport_type.hpp

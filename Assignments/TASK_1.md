@@ -9,6 +9,8 @@ Si à un moment quelconque du programme, vous souhaitiez accéder à l'avion aya
 
 ---
 
+Je pourrais le chercher dans la `move_queue` ou la `display_queue`.
+
 ## Objectif 1 - Référencement des avions
 
 ### A - Choisir l'architecture
@@ -30,9 +32,24 @@ Il serait donc bon de savoir qui est censé détruire les avions du programme, a
 
 Répondez aux questions suivantes :
 1. Qui est responsable de détruire les avions du programme ? (si vous ne trouvez pas, faites/continuez la question 4 dans TASK_0)
+
+`opengl_interface` lorsqu'un avion a été desservi et qu'il n'est plus au terminal.
+
 2. Quelles autres structures contiennent une référence sur un avion au moment où il doit être détruit ?
+
+`Displayable::display_queue` est de type `std::vector<const Displayable*>`
+`DynamicObject::move_queue` est de type `std::unordered_set<DynamicObject*>`
+`Terminal::current_aircraft` est de type `Aircraft*`
+`Tower::reserved_terminals` est de type `std::map<const Aircraft*, size_t>`
+
 3. Comment fait-on pour supprimer la référence sur un avion qui va être détruit dans ces structures ?
+
+On utilise la fonction `erase` des conteneurs quand il faut supprimer l'avion du programme.
+D'abord dans la boucle sur `move_queue` et dans le destructeur de `Displayable` pour `display_queue`
+
 4. Pourquoi n'est-il pas très judicieux d'essayer d'appliquer la même chose pour votre `AircraftManager` ?
+
+Je sais pas ?
 
 Pour simplifier le problème, vous allez déplacer l'ownership des avions dans la classe `AircraftManager`.
 Vous allez également faire en sorte que ce soit cette classe qui s'occupe de déplacer les avions, et non plus la fonction `timer`.
@@ -51,6 +68,48 @@ Enfin, faites ce qu'il faut pour que `create_aircraft` donne l'avion qu'elle cr�
 Testez que le programme fonctionne toujours.
 
 ---
+
+j'ai une classe AircraftManager :
+
+```cpp
+class AircraftManager : public GL::DynamicObject
+{
+private:
+    std::vector<std::unique_ptr<Aircraft>> aircrafts;
+public:
+    bool update() override;
+    void add_aircraft(std::unique_ptr<Aircraft> aircraft);
+};
+```
+
+À l'initialisation de l'aéroport, on cree le `AircraftManager` et on l'ajoute à la `move_queue` :
+
+```cpp
+void TowerSimulation::init_airport()
+{
+    airport = new Airport { one_lane_airport, Point3D { 0, 0, 0 },
+                            new img::Image { one_lane_airport_sprite_path.get_full_path() } };
+
+    aircraft_manager = new AircraftManager {};
+    GL::move_queue.emplace(airport);
+    GL::move_queue.emplace(aircraft_manager);
+}
+```
+
+Et à la création des avions, on les ajoute dans l'AircraftManager :
+
+```cpp
+aircraft_manager->add_aircraft(std::make_unique<Aircraft>(type, flight_number, start, direction, airport->get_tower()));
+```
+
+Il n'y a plus besoin de gérer la suppression des avions dans le timer :
+
+```cpp
+for (auto dynamic_object : move_queue)
+{
+    dynamic_object->update();
+}
+```
 
 ## Objectif 2 - Usine à avions
 

@@ -91,18 +91,9 @@ void timer(const int step)
 {
     if (running)
     {
-        for (auto it = move_queue.begin(); it != move_queue.end();)
+        for (auto dynamic_object : move_queue)
         {
-            DynamicObject* item = *it;
-            if (item->update())
-            {
-                ++it;
-            }
-            else
-            {
-                it = move_queue.erase(it);
-                delete item;
-            }
+            dynamic_object->update();
         }
     }
     glutPostRedisplay();
