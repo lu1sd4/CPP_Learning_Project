@@ -73,13 +73,13 @@ void decrease_fps()
 void display(void)
 {
     // sort the displayables by their z-coordinate
-    std::sort(display_queue.begin(), display_queue.end(), disp_z_cmp {});
+    std::sort(Displayable::display_queue.begin(), Displayable::display_queue.end(), disp_z_cmp {});
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-zoom, zoom, -zoom, zoom, 0.0f, 1.0f); // left, right, bottom, top, near, far
     glClear(GL_COLOR_BUFFER_BIT);
     glEnable(GL_TEXTURE_2D);
-    for (const auto& item : display_queue)
+    for (const auto& item : Displayable::display_queue)
     {
         item->display();
     }

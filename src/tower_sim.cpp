@@ -40,7 +40,7 @@ void TowerSimulation::create_aircraft(const AircraftType& type) const
     const Point3D direction = (-start).normalize();
 
     Aircraft* aircraft = new Aircraft { type, flight_number, start, direction, airport->get_tower() };
-    GL::display_queue.emplace_back(aircraft);
+//    GL::display_queue.emplace_back(aircraft);
     GL::move_queue.emplace(aircraft);
 }
 
@@ -80,7 +80,7 @@ void TowerSimulation::init_airport()
     airport = new Airport { one_lane_airport, Point3D { 0, 0, 0 },
                             new img::Image { one_lane_airport_sprite_path.get_full_path() } };
 
-    GL::display_queue.emplace_back(airport);
+//    GL::display_queue.emplace_back(airport);
     GL::move_queue.emplace(airport);
 }
 
