@@ -7,6 +7,13 @@
 `TowerSimulation::display_help()` est chargé de l'affichage des touches disponibles.
 Dans sa boucle, remplacez `const auto& ks_pair` par un structured binding adapté.
 
+```cpp
+for (const auto& [ key, action ] : GL::keystrokes)
+{
+    std::cout << key << ' ';
+}
+```
+
 ### B - Algorithmes divers
 
 1. `AircraftManager::move()` (ou bien `update()`) supprime les avions de la `move_queue` dès qu'ils sont "hors jeux".
