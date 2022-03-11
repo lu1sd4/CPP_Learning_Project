@@ -126,11 +126,54 @@ Pour éviter l'usage de variables globales, vous allez créer une classe `Aircra
 Définissez cette classe, instanciez-la à l'endroit qui vous paraît le plus approprié, et refactorisez le code pour l'utiliser.
 Vous devriez du coup pouvoir supprimer les variables globales `airlines` et `aircraft_types`.
 
+```cpp
+#pragma once
+
+#include "aircraft.hpp"
+#include "airport.hpp"
+
+class AircraftFactory
+{
+public:
+    static std::unique_ptr<Aircraft> with_airport(Airport* airport)
+    {
+        const std::string flight_number = airlines[std::rand() % 8] + std::to_string(1000 + (rand() % 9000));
+        const float angle       = (rand() % 1000) * 2 * 3.141592f / 1000.f; // random angle between 0 and 2pi
+        const Point3D start     = Point3D { std::sin(angle), std::cos(angle), 0 } * 3 + Point3D { 0, 0, 2 };
+        const Point3D direction = (-start).normalize();
+        return std::make_unique<Aircraft>(*(aircraft_types[rand() % 3]), flight_number, start, direction, airport->get_tower());
+    }
+    static inline void init_aircraft_types()
+    {
+        aircraft_types[0] = new AircraftType { .02f, .05f, .02f, MediaPath { "l1011_48px.png" } };
+        aircraft_types[1] = new AircraftType { .02f, .05f, .02f, MediaPath { "b707_jat.png" } };
+        aircraft_types[2] = new AircraftType { .04f, .1f, .04f, MediaPath { "concorde_af.png" } };
+    };
+private:
+    static inline const std::string airlines[8] = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
+    static inline const AircraftType* aircraft_types[3];
+};
+```
+
 ### B - Conflits
 
 Il est rare, mais possible, que deux avions soient créés avec le même numéro de vol.
 Ajoutez un conteneur dans votre classe `AircraftFactory` contenant tous les numéros de vol déjà utilisés.
 Faites maintenant en sorte qu'il ne soit plus possible de créer deux fois un avion avec le même numéro de vol.
+
+```cpp
+private:
+  std::set<std::string> flight_numbers;
+
+std::unique_ptr<Aircraft> with_airport(Airport* airport)
+{
+    std::string flight_number;
+    do {
+        flight_number = airlines[std::rand() % 8] + std::to_string(1000 + (rand() % 9000));
+    } while(flight_numbers.find(flight_number) != flight_numbers.end());
+    //...
+}
+```
 
 ### C - Data-driven AircraftType (optionnel)
 
