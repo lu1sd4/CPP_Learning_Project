@@ -25,7 +25,7 @@ private:
 
 public:
     TowerSimulation(int argc, char** argv);
-    ~TowerSimulation();
+    ~TowerSimulation() = default;
 
     void launch();
 };
