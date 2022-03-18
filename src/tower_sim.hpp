@@ -9,9 +9,9 @@ class TowerSimulation
 {
 private:
     bool help        = false;
-    Airport* airport = nullptr;
-    AircraftManager* aircraft_manager = nullptr;
-    AircraftFactory* aircraft_factory = nullptr;
+    std::unique_ptr<Airport> airport = nullptr;
+    std::unique_ptr<AircraftManager> aircraft_manager = nullptr;
+    std::unique_ptr<AircraftFactory> aircraft_factory = nullptr;
 
     TowerSimulation(const TowerSimulation&) = delete;
     TowerSimulation& operator=(const TowerSimulation&) = delete;

@@ -20,14 +20,12 @@ public:
         const Point3D direction = (-start).normalize();
         return std::make_unique<Aircraft>(*(aircraft_types[rand() % 3]), flight_number, start, direction, airport->get_tower());
     }
-    static inline void init_aircraft_types()
-    {
-        aircraft_types[0] = new AircraftType { .02f, .05f, .02f, MediaPath { "l1011_48px.png" } };
-        aircraft_types[1] = new AircraftType { .02f, .05f, .02f, MediaPath { "b707_jat.png" } };
-        aircraft_types[2] = new AircraftType { .04f, .1f, .04f, MediaPath { "concorde_af.png" } };
-    };
 private:
-    static inline const std::string airlines[8] = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
-    static inline const AircraftType* aircraft_types[3];
+    const std::string airlines[8] = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
+    const AircraftType* aircraft_types[3] = {
+        new AircraftType { .02f, .05f, .02f, MediaPath { "l1011_48px.png" } },
+        new AircraftType { .02f, .05f, .02f, MediaPath { "b707_jat.png" } },
+        new AircraftType { .04f, .1f, .04f, MediaPath { "concorde_af.png" } }
+    };
     std::set<std::string> flight_numbers;
 };

@@ -24,15 +24,10 @@ TowerSimulation::TowerSimulation(int argc, char** argv) :
     create_keystrokes();
 }
 
-TowerSimulation::~TowerSimulation()
-{
-    delete airport;
-}
-
 void TowerSimulation::create_random_aircraft() const
 {
     assert(airport); // make sure the airport is initialized before creating aircraft
-    aircraft_manager->add_aircraft(aircraft_factory->with_airport(airport));
+    aircraft_manager->add_aircraft(aircraft_factory->with_airport(airport.get()));
 }
 
 void TowerSimulation::create_keystrokes() const
@@ -63,14 +58,14 @@ void TowerSimulation::display_help() const
 
 void TowerSimulation::init_airport()
 {
-    airport = new Airport { one_lane_airport, Point3D { 0, 0, 0 },
-                            new img::Image { one_lane_airport_sprite_path.get_full_path() } };
+    airport = std::make_unique<Airport>( one_lane_airport, Point3D { 0, 0, 0 },
+                            new img::Image { one_lane_airport_sprite_path.get_full_path() });
 
-    aircraft_factory = new AircraftFactory {};
-    aircraft_manager = new AircraftManager {};
+    aircraft_factory = std::make_unique<AircraftFactory>();
+    aircraft_manager = std::make_unique<AircraftManager>();
 
-    GL::move_queue.emplace(airport);
-    GL::move_queue.emplace(aircraft_manager);
+    GL::move_queue.emplace(airport.get());
+    GL::move_queue.emplace(aircraft_manager.get());
 }
 
 void TowerSimulation::launch()
@@ -82,7 +77,6 @@ void TowerSimulation::launch()
     }
 
     init_airport();
-    AircraftFactory::init_aircraft_types();
 
     GL::loop();
 }
