@@ -38,6 +38,23 @@ bool AircraftManager::update() {
 A cette fin, rajoutez des callbacks sur les touches `0`..`7` de manière à ce que le nombre d'avions appartenant à `airlines[x]` soit affiché en appuyant sur `x`.
 Rendez-vous compte de quelle classe peut acquérir cet information. Utilisez la bonne fonction de `<algorithm>` pour obtenir le résultat.
 
+```cpp
+int AircraftManager::count_in_airline(const std::string& airline) const
+{
+    return std::count_if(aircrafts.begin(), aircrafts.end(), [airline](const auto& a) {
+         return a->get_flight_num().substr(0,2) == airline;
+    });
+}
+```
+
+```cpp
+void TowerSimulation::display_count_airline(const int& airline_index) const
+{
+    const auto airline_name = aircraft_factory->airlines[airline_index];
+    std::cout << aircraft_manager->count_in_airline(airline_name) << " aircrafts in " << airline_name << std::endl;
+}
+```
+
 ### C - Relooking de Point3D
 
 La classe `Point3D` présente beaucoup d'opportunités d'appliquer des algorithmes.

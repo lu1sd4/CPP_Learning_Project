@@ -41,6 +41,16 @@ void TowerSimulation::create_keystrokes() const
     GL::keystrokes.emplace('<', []() { GL::decrease_fps(); });
     GL::keystrokes.emplace('f', []() { GL::toggle_fullscreen(); });
     GL::keystrokes.emplace('p', []() { GL::toggle_pause(); });
+    for (int i = 0; i <= 7; ++i)
+    {
+        GL::keystrokes.emplace('0'+i, [this, i]() { display_count_airline(i); });
+    }
+}
+
+void TowerSimulation::display_count_airline(const int& airline_index) const
+{
+    const auto airline_name = aircraft_factory->airlines[airline_index];
+    std::cout << aircraft_manager->count_in_airline(airline_name) << " aircrafts in " << airline_name << std::endl;
 }
 
 void TowerSimulation::display_help() const

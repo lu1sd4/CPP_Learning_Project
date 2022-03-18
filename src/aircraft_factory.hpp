@@ -21,6 +21,8 @@ public:
         return std::make_unique<Aircraft>(*(aircraft_types[rand() % 3]), flight_number, start, direction, airport->get_tower());
     }
 private:
+    friend class TowerSimulation;
+
     const std::string airlines[8] = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
     const AircraftType* aircraft_types[3] = {
         new AircraftType { .02f, .05f, .02f, MediaPath { "l1011_48px.png" } },
