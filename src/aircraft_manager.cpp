@@ -1,20 +1,17 @@
 #include "aircraft_manager.hpp"
 
+#include <algorithm>
+
 bool AircraftManager::update() {
-    for (auto it = aircrafts.begin(); it != aircrafts.end();)
-    {
-        auto& item = *it;
-        if (item->update())
-        {
-            ++it;
-        }
-        else
-        {
-            it = aircrafts.erase(it);
-        }
-    }
+    aircrafts.erase(
+        std::remove_if(
+            aircrafts.begin(),
+            aircrafts.end(),
+            [](auto& a) { return !a->update(); }),
+    aircrafts.end());
     return true;
 }
+
 void AircraftManager::add_aircraft(std::unique_ptr<Aircraft> aircraft)
 {
     aircrafts.emplace_back(std::move(aircraft));

@@ -22,6 +22,18 @@ Remplacez votre boucle avec un appel à `std::remove_if`.
 
 **Attention**: pour cela c'est necessaire que `AircraftManager` stocke les avion dans un `std::vector` ou `std::list` (c'est déjà le cas pour la solution filé).
 
+```cpp
+bool AircraftManager::update() {
+    aircrafts.erase(
+        std::remove_if(
+            aircrafts.begin(),
+            aircrafts.end(),
+            [](auto& a) { return !a->update(); }),
+    aircrafts.end());
+    return true;
+}
+```
+
 2. Pour des raisons de statistiques, on aimerait bien être capable de compter tous les avions de chaque airline.
 A cette fin, rajoutez des callbacks sur les touches `0`..`7` de manière à ce que le nombre d'avions appartenant à `airlines[x]` soit affiché en appuyant sur `x`.
 Rendez-vous compte de quelle classe peut acquérir cet information. Utilisez la bonne fonction de `<algorithm>` pour obtenir le résultat.
