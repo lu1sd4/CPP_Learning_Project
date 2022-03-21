@@ -68,6 +68,8 @@ remplacez le code des fonctions suivantes en utilisant des fonctions de `<algori
 
 ---
 
+
+
 ## Objectif 2 - Rupture de kérosène
 
 Vous allez introduire la gestion de l'essence dans votre simulation.\
