@@ -68,7 +68,36 @@ remplacez le code des fonctions suivantes en utilisant des fonctions de `<algori
 
 ---
 
+Operator `*=`
+```cpp
+Point3D& operator*=(const float scalar)
+{
+    std::transform (values.begin(), values.end(), values.begin(), [&scalar](const float& coord) { return coord * scalar; });
+    return *this;
+}
+```
 
+Operator `+=` et `-=`
+```cpp
+Point3D& operator+=(const Point3D& other)
+{
+    std::transform (values.begin(), values.end(), other.values.begin(), values.begin(), std::plus<>());
+    return *this;
+}
+
+Point3D& operator-=(const Point3D& other)
+{
+    std::transform (values.begin(), values.end(), other.values.begin(), values.begin(), std::minus<>());
+    return *this;
+}
+```
+
+`Point3D::length() const`
+```cpp
+float length() const {
+    return std::sqrt(std::accumulate(values.begin(), values.end(), 0., [](const auto& acc, const auto& current) { return acc + current * current; }));
+}
+```
 
 ## Objectif 2 - Rupture de kérosène
 
