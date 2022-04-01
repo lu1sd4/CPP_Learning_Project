@@ -9,6 +9,7 @@
 
 #include <string>
 #include <string_view>
+#include <random>
 
 class Aircraft : public GL::Displayable, public GL::DynamicObject
 {
@@ -18,6 +19,7 @@ private:
     Point3D pos, speed; // note: the speed should always be normalized to length 'speed'
     WaypointQueue waypoints = {};
     Tower& control;
+    int fuel;
     bool landing_gear_deployed = false; // is the landing gear deployed?
     bool is_at_terminal        = false;
     bool has_been_serviced     = false;
@@ -56,6 +58,9 @@ public:
         control { control_ }
     {
         speed.cap_length(max_speed());
+        std::random_device rd;
+        std::uniform_int_distribution<int> dist(150, 3000);
+        fuel = dist(rd);
     }
 
     const std::string& get_flight_num() const { return flight_number; }

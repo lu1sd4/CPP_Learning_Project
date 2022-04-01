@@ -100,6 +100,11 @@ bool Aircraft::update()
 
     if (!is_at_terminal)
     {
+        fuel--;
+        if (fuel <= 0) {
+            std::cout << flight_number << " out of fuel" << std::endl;
+            return false;
+        }
         turn_to_waypoint();
         // move in the direction of the current speed
         pos += speed;

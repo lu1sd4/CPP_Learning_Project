@@ -114,6 +114,25 @@ Lorsque cette valeur atteint 0, affichez un message dans la console pour indique
 
 N'hésitez pas à adapter la borne `150` - `3'000`, de manière à ce que des avions se crashent de temps en temps.
 
+---
+
+Dans le constructeur
+```cpp
+std::random_device rd;
+std::uniform_int_distribution<int> dist(150, 3000);
+fuel = dist(rd);
+```
+
+Dans update
+
+```cpp
+fuel--;
+if (fuel <= 0) {
+    std::cout << flight_number << " out of fuel" << std::endl;
+    return false;
+}
+```
+
 ### B - Un terminal s'il vous plaît
 
 Afin de minimiser les crashs, il va falloir changer la stratégie d'assignation des terminaux aux avions.
