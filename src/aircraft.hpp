@@ -59,12 +59,15 @@ public:
     {
         speed.cap_length(max_speed());
         std::random_device rd;
-        std::uniform_int_distribution<int> dist(150, 3000);
+        std::uniform_int_distribution<int> dist(5000, 10000);
         fuel = dist(rd);
     }
 
     const std::string& get_flight_num() const { return flight_number; }
     float distance_to(const Point3D& p) const { return pos.distance_to(p); }
+
+    bool has_terminal() const;
+    bool is_circling() const;
 
     void display() const override;
     bool update() override;

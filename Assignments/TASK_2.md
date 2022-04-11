@@ -148,6 +148,58 @@ Pour pouvoir prioriser les avions avec moins d'essence, il faudrait déjà que l
 \- si l'avion attend qu'on lui assigne un terminal, on appelle `Tower::reserve_terminal` et on modifie ses `waypoints` si le terminal a effectivement pu être réservé,\
 \- si l'avion a terminé sa course actuelle, on appelle `Tower::get_instructions` (comme avant).
 
+---
+
+1. 
+```cpp
+bool Aircraft::has_terminal() const
+{
+    return !waypoints.empty() && waypoints.back().is_at_terminal();
+}
+```
+
+2.
+```cpp
+bool Aircraft::is_circling() const
+{
+    return !waypoints.empty() && !waypoints.front().is_on_ground() && !has_been_serviced;
+}
+```
+
+3.
+```cpp
+if (waypoints.empty()) {
+    if (has_been_serviced)
+    {
+        return false;
+    } else
+    {
+        waypoints = control.get_instructions(*this);
+    }
+}
+if (!has_terminal() && is_circling())
+{
+    auto path_to_terminal = control.reserve_terminal(*this);
+    if (path_to_terminal.empty())
+    {
+        waypoints = control.get_instructions(*this);
+    }
+}
+```
+
+4.
+```cpp
+if (!has_terminal() && is_circling())
+{
+    auto path_to_terminal = control.reserve_terminal(*this);
+    if (!path_to_terminal.empty())
+    {
+        waypoints.clear();
+        std::copy(path_to_terminal.begin(), path_to_terminal.end(), std::back_inserter(waypoints));
+    }
+}
+```
+
 ### C - Minimiser les crashs
 
 Grâce au changement précédent, dès lors qu'un terminal est libéré, il sera réservé lors du premier appel à `Aircraft::update` d'un avion recherchant un terminal.

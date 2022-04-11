@@ -90,8 +90,7 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
 
 bool Aircraft::update()
 {
-    if (waypoints.empty())
-    {
+    if (waypoints.empty()) {
         if (has_been_serviced) {
             return false;
         }
@@ -105,6 +104,17 @@ bool Aircraft::update()
             std::cout << flight_number << " out of fuel" << std::endl;
             return false;
         }
+
+        if (!has_terminal() && is_circling())
+        {
+            auto path_to_terminal = control.reserve_terminal(*this);
+            if (!path_to_terminal.empty())
+            {
+                waypoints.clear();
+                std::copy(path_to_terminal.begin(), path_to_terminal.end(), std::back_inserter(waypoints));
+            }
+        }
+
         turn_to_waypoint();
         // move in the direction of the current speed
         pos += speed;
@@ -145,6 +155,16 @@ bool Aircraft::update()
         GL::Displayable::z = pos.x() + pos.y();
     }
     return true;
+}
+
+bool Aircraft::has_terminal() const
+{
+    return !waypoints.empty() && waypoints.back().is_at_terminal();
+}
+
+bool Aircraft::is_circling() const
+{
+    return !waypoints.empty() && !waypoints.front().is_on_ground() && !has_been_serviced;
 }
 
 void Aircraft::display() const
