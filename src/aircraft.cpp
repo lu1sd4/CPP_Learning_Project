@@ -91,10 +91,10 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
 bool Aircraft::update()
 {
     if (waypoints.empty()) {
+        waypoints = control.get_instructions(*this);
         if (has_been_serviced) {
             return false;
         }
-        waypoints = control.get_instructions(*this);
     }
 
     if (!is_at_terminal)

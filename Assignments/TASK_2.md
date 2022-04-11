@@ -230,6 +230,22 @@ C - NotReserved / Fuel: 300
 Assurez-vous déjà que le conteneur `AircraftManager::aircrafts` soit ordonnable (`vector`, `list`, etc).\
 Au début de la fonction `AircraftManager::move` (ou `update`), ajoutez les instructions permettant de réordonner les `aircrafts` dans l'ordre défini ci-dessus.
 
+----
+
+```cpp
+bool AircraftManager::update() {
+    std::sort(
+        aircrafts.begin(),
+        aircrafts.end(),
+        [](const std::unique_ptr<Aircraft>& a1, const std::unique_ptr<Aircraft>& a2)
+        {
+            if (a1->has_terminal()) return false; // if a1 has terminal it's not ahead of a2
+            return a1->fuel < a2->fuel; // if a1 has less fuel than a2 it's ahead of a2
+        }
+    );
+    ...
+```
+
 ### D - Réapprovisionnement 
 
 Afin de pouvoir repartir en toute sécurité, les avions avec moins de `200` unités d'essence doivent être réapprovisionnés par l'aéroport pendant qu'ils sont au terminal.

@@ -59,7 +59,7 @@ public:
     {
         speed.cap_length(max_speed());
         std::random_device rd;
-        std::uniform_int_distribution<int> dist(5000, 10000);
+        std::uniform_int_distribution<int> dist(150, 3000);
         fuel = dist(rd);
     }
 
@@ -73,4 +73,5 @@ public:
     bool update() override;
 
     friend class Tower;
+    friend class AircraftManager;
 };
