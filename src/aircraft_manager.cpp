@@ -19,6 +19,9 @@ bool AircraftManager::update() {
             aircrafts.end(),
             [](auto& a) { return !a->update(); }),
     aircrafts.end());
+
+    std::cout << "required fuel " << get_required_fuel() << std::endl;
+
     return true;
 }
 
@@ -31,4 +34,14 @@ int AircraftManager::count_in_airline(const std::string& airline) const
     return std::count_if(aircrafts.begin(), aircrafts.end(), [airline](const auto& a) {
          return a->get_flight_num().substr(0,2) == airline;
     });
+}
+int AircraftManager::get_required_fuel() const
+{
+    int sum = 0;
+    for (const auto& aircraft: aircrafts) {
+        if (aircraft->is_low_on_fuel() && !aircraft->has_been_serviced) {
+            sum += (3000 - aircraft->fuel);
+        }
+    }
+    return sum;
 }

@@ -274,9 +274,32 @@ bool update() override
 \- l'avion est bientôt à court d'essence\
 \- l'avion n'est pas déjà reparti de l'aéroport.
 
+---
+
+```cpp
+int AircraftManager::get_required_fuel() const
+{
+    int sum = 0;
+    for (const auto& aircraft: aircrafts) {
+        if (aircraft->is_low_on_fuel() && !aircraft->has_been_serviced) {
+            sum += (3000 - aircraft->fuel);
+        }
+    }
+    return sum;
+}
+```
+
+---
+
 3. Ajoutez deux attributs `fuel_stock` et `ordered_fuel` dans la classe `Airport`, que vous initialiserez à 0.\
 Ajoutez également un attribut `next_refill_time`, aussi initialisé à 0.\
 Enfin, faites en sorte que la classe `Airport` ait accès à votre `AircraftManager` de manière à pouvoir l'interroger.
+
+---
+
+
+
+---
 
 4. Ajoutez une fonction `refill` à la classe `Aircraft`, prenant un paramètre `fuel_stock` par référence non-constante.
 Cette fonction rempliera le réservoir de l'avion en soustrayant ce dont il a besoin de `fuel_stock`.
