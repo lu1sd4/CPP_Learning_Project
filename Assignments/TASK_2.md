@@ -305,7 +305,7 @@ int next_refill_time;
 ```
 
 ```cpp
-manager { manager },
+manager { _manager },
 fuel_stock { 0 },
 ordered_fuel { 0 },
 next_refill_time { 0 }
@@ -340,7 +340,7 @@ Elle devra appeler la fonction `refill` sur l'avion actuellement au terminal, si
 ```cpp
 void refill_aircraft_if_needed(int& fuel_stock)
 {
-    if (current_aircraft->is_low_on_fuel()) {
+    if (in_use() && current_aircraft->is_low_on_fuel()) {
         current_aircraft->refill(fuel_stock);
     }
 }
@@ -356,6 +356,30 @@ void refill_aircraft_if_needed(int& fuel_stock)
     \* La quantité d'essence reçue, la quantité d'essence en stock et la nouvelle quantité d'essence commandée sont affichées dans la console.\
 \- Sinon `next_refill_time` est décrémenté.\
 \- Chaque terminal réapprovisionne son avion s'il doit l'être.
+
+---
+
+```cpp
+bool update() override
+{
+    if (next_refill_time == 0) {
+        fuel_stock += ordered_fuel;
+        std::cout << "fuel: restock " << ordered_fuel << " - now in stock " << fuel_stock;
+        ordered_fuel = std::min(manager->get_required_fuel(), 5000);
+        std::cout << " - order " << ordered_fuel << std::endl;
+        next_refill_time = 100;
+    } else {
+        next_refill_time--;
+    }
+    for (auto& t : terminals) {
+        t.refill_aircraft_if_needed(fuel_stock);
+        t.update();
+    }
+    return true;
+}
+```
+
+---
 
 ### E - Déréservation
 

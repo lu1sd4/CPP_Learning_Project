@@ -20,8 +20,6 @@ bool AircraftManager::update() {
             [](auto& a) { return !a->update(); }),
     aircrafts.end());
 
-    std::cout << "required fuel " << get_required_fuel() << std::endl;
-
     return true;
 }
 

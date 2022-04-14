@@ -9,6 +9,7 @@
 #include "runway.hpp"
 #include "terminal.hpp"
 #include "tower.hpp"
+#include "aircraft_manager.hpp"
 
 #include <vector>
 
@@ -55,14 +56,14 @@ private:
     Terminal& get_terminal(const size_t terminal_num) { return terminals.at(terminal_num); }
 
 public:
-    Airport(const AirportType& type_, const Point3D& pos_, const img::Image* image, const AircraftManager *manager, const float z_ = 1.0f) :
+    Airport(const AirportType& type_, const Point3D& pos_, const img::Image* image, const AircraftManager *_manager, const float z_ = 1.0f) :
         GL::Displayable { z_ },
         type { type_ },
         pos { pos_ },
         texture { image },
         terminals { type.create_terminals() },
         tower { *this },
-        manager { manager },
+        manager { _manager },
         fuel_stock { 0 },
         ordered_fuel { 0 },
         next_refill_time { 0 }
@@ -74,8 +75,17 @@ public:
 
     bool update() override
     {
-        for (auto& t : terminals)
-        {
+        if (next_refill_time == 0) {
+            fuel_stock += ordered_fuel;
+            std::cout << "fuel: restock " << ordered_fuel << " - now in stock " << fuel_stock;
+            ordered_fuel = std::min(manager->get_required_fuel(), 5000);
+            std::cout << " - order " << ordered_fuel << std::endl;
+            next_refill_time = 100;
+        } else {
+            next_refill_time--;
+        }
+        for (auto& t : terminals) {
+            t.refill_aircraft_if_needed(fuel_stock);
             t.update();
         }
         return true;
