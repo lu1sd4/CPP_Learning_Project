@@ -335,6 +335,19 @@ void refill(int& fuel_stock)
 5. Définissez maintenant une fonction `refill_aircraft_if_needed` dans la classe `Terminal`, prenant un paramètre `fuel_stock` par référence non-constante.
 Elle devra appeler la fonction `refill` sur l'avion actuellement au terminal, si celui-ci a vraiment besoin d'essence.  
 
+---
+
+```cpp
+void refill_aircraft_if_needed(int& fuel_stock)
+{
+    if (current_aircraft->is_low_on_fuel()) {
+        current_aircraft->refill(fuel_stock);
+    }
+}
+```
+
+---
+
 6. Modifiez la fonction `Airport::update`, afin de mettre-en-oeuvre les étapes suivantes.\
 \- Si `next_refill_time` vaut 0 :\
     \* `fuel_stock` est incrémenté de la valeur de `ordered_fuel`.\
