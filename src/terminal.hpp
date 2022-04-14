@@ -41,7 +41,7 @@ public:
 
     bool update() override
     {
-        if (in_use() && is_servicing())
+        if (in_use() && is_servicing() && !current_aircraft->is_low_on_fuel())
         {
             ++service_progress;
         }
