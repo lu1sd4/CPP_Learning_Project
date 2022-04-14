@@ -77,3 +77,13 @@ void Tower::arrived_at_terminal(const Aircraft& aircraft)
     const auto it = reserved_terminals[&aircraft];
     airport.get_terminal(it).start_service(aircraft);
 }
+
+void Tower::release_terminal(Aircraft& aircraft)
+{
+    auto terminal_num = reserved_terminals.find(&aircraft);
+    if (terminal_num != reserved_terminals.end()) {
+        Terminal& terminal = airport.get_terminal(terminal_num->second);
+        terminal.release();
+        reserved_terminals.erase(&aircraft);
+    }
+}

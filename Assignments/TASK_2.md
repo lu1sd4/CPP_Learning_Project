@@ -388,6 +388,22 @@ En effet, lorsque les avions se crashent alors qu'ils avaient un terminal de ré
 
 Pour garantir cela, vous allez modifier le destructeur de `Aircraft`. Si l'avion a réservé un terminal, assurez-vous que celui-ci est correctement libéré. Pour cela, vous aurez besoin de rajouter une fonction dans la classe `Tower`. Choisissez-lui un nom qui décrit correctement ce qu'elle fait.
 
+---
+
+```cpp
+void Tower::release_terminal(Aircraft& aircraft)
+{
+    auto terminal_num = reserved_terminals.find(&aircraft);
+    if (terminal_num != reserved_terminals.end()) {
+        Terminal& terminal = airport.get_terminal(terminal_num->second);
+        terminal.release();
+        reserved_terminals.erase(&aircraft);
+    }
+}
+```
+
+---
+
 ### F - Paramétrage (optionnel)
 
 Pour le moment, tous les avions ont la même consommation d'essence (1 unité / trame) et la même taille de réservoir (`3'000`).

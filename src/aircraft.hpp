@@ -87,6 +87,13 @@ public:
         std::cout << "refilled " << get_flight_num() << " with " << to_refill << " fuel units" << std::endl;
     }
 
+    ~Aircraft()
+    {
+        if (has_terminal()) {
+            control.release_terminal(*this);
+        }
+    }
+
     friend class Tower;
     friend class AircraftManager;
 };
