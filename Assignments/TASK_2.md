@@ -321,7 +321,13 @@ Indiquez dans la console quel avion a été réapprovisionné ainsi que la quant
 ---
 
 ```cpp
-
+void refill(int& fuel_stock)
+{
+    int to_refill = std::min(fuel_stock, missing_fuel());
+    fuel_stock -= to_refill;
+    fuel += to_refill;
+    std::cout << "refilled " << get_flight_num() << " with " << to_refill << " fuel units" << std::endl;
+}
 ```
 
 ---

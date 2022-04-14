@@ -43,6 +43,10 @@ private:
     void add_waypoint(const Waypoint& wp, const bool front);
     bool is_on_ground() const { return pos.z() < DISTANCE_THRESHOLD; }
     float max_speed() const { return is_on_ground() ? type.max_ground_speed : type.max_air_speed; }
+    int missing_fuel() const
+    {
+        return 3000 - fuel;
+    }
 
     Aircraft(const Aircraft&) = delete;
     Aircraft& operator=(const Aircraft&) = delete;
@@ -75,6 +79,13 @@ public:
 
     void display() const override;
     bool update() override;
+    void refill(int& fuel_stock)
+    {
+        int to_refill = std::min(fuel_stock, missing_fuel());
+        fuel_stock -= to_refill;
+        fuel += to_refill;
+        std::cout << "refilled " << get_flight_num() << " with " << to_refill << " fuel units" << std::endl;
+    }
 
     friend class Tower;
     friend class AircraftManager;
