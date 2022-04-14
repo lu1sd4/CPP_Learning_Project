@@ -68,11 +68,11 @@ void TowerSimulation::display_help() const
 
 void TowerSimulation::init_airport()
 {
-    airport = std::make_unique<Airport>( one_lane_airport, Point3D { 0, 0, 0 },
-                            new img::Image { one_lane_airport_sprite_path.get_full_path() });
-
     aircraft_factory = std::make_unique<AircraftFactory>();
     aircraft_manager = std::make_unique<AircraftManager>();
+
+    airport = std::make_unique<Airport>( one_lane_airport, Point3D { 0, 0, 0 },
+                            new img::Image { one_lane_airport_sprite_path.get_full_path() }, aircraft_manager.get());
 
     GL::move_queue.emplace(airport.get());
     GL::move_queue.emplace(aircraft_manager.get());

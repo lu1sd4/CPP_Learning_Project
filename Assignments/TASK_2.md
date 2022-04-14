@@ -297,7 +297,19 @@ Enfin, faites en sorte que la classe `Airport` ait accès à votre `AircraftMana
 
 ---
 
+```cpp
+AircraftManager *manager;
+int fuel_stock;
+int ordered_fuel;
+int next_refill_time;
+```
 
+```cpp
+manager { manager },
+fuel_stock { 0 },
+ordered_fuel { 0 },
+next_refill_time { 0 }
+```
 
 ---
 
@@ -305,6 +317,14 @@ Enfin, faites en sorte que la classe `Airport` ait accès à votre `AircraftMana
 Cette fonction rempliera le réservoir de l'avion en soustrayant ce dont il a besoin de `fuel_stock`.
 Bien entendu, `fuel_stock` ne peut pas devenir négatif.\
 Indiquez dans la console quel avion a été réapprovisionné ainsi que la quantité d'essence utilisée.
+
+---
+
+```cpp
+
+```
+
+---
 
 5. Définissez maintenant une fonction `refill_aircraft_if_needed` dans la classe `Terminal`, prenant un paramètre `fuel_stock` par référence non-constante.
 Elle devra appeler la fonction `refill` sur l'avion actuellement au terminal, si celui-ci a vraiment besoin d'essence.  
