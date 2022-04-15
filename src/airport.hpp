@@ -33,6 +33,8 @@ private:
     // otherwise, return an empty waypoint-vector and any number
     std::pair<WaypointQueue, size_t> reserve_terminal(Aircraft& aircraft)
     {
+        assert(!aircraft.has_terminal());
+
         const auto it =
             std::find_if(terminals.begin(), terminals.end(), [](const Terminal& t) { return !t.in_use(); });
 

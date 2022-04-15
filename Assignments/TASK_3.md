@@ -84,3 +84,24 @@ Voici quelques idées :
 - état attendu d'un objet lorsqu'une fonction est appelée dessus
 - vérification de certains paramètres de fonctions
 - ...
+
+---
+
+```cpp
+std::pair<WaypointQueue, size_t> reserve_terminal(Aircraft& aircraft)
+{
+    assert(!aircraft.has_terminal());
+```
+
+```cpp
+// when we arrive at a terminal, signal the tower
+void Aircraft::arrive_at_terminal()
+{
+    assert(!is_at_terminal);
+    // we arrived at a terminal, so start servicing
+    control.arrived_at_terminal(*this);
+    is_at_terminal = true;
+}
+```
+
+---

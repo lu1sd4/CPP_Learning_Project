@@ -46,6 +46,7 @@ unsigned int Aircraft::get_speed_octant() const
 // when we arrive at a terminal, signal the tower
 void Aircraft::arrive_at_terminal()
 {
+    assert(!is_at_terminal);
     // we arrived at a terminal, so start servicing
     control.arrived_at_terminal(*this);
     is_at_terminal = true;
