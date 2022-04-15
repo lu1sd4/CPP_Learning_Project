@@ -63,7 +63,13 @@ int AircraftManager::get_crashed_planes() const
 ---
 
 ```cpp
-
+if (!is_at_terminal)
+{
+    fuel--;
+    if (fuel <= 0) {
+        using namespace std::string_literals;
+        throw AircraftCrash { flight_number + " out of fuel"s };
+    }
 ```
 
 ---
