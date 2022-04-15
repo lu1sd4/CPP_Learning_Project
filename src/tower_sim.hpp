@@ -18,6 +18,7 @@ private:
 
     void create_random_aircraft() const;
     void display_count_airline(const int& airline_index) const;
+    void display_crashed_planes() const;
 
     void create_keystrokes() const;
     void display_help() const;

@@ -41,6 +41,7 @@ void TowerSimulation::create_keystrokes() const
     GL::keystrokes.emplace('<', []() { GL::decrease_fps(); });
     GL::keystrokes.emplace('f', []() { GL::toggle_fullscreen(); });
     GL::keystrokes.emplace('p', []() { GL::toggle_pause(); });
+    GL::keystrokes.emplace('m', [this]() { display_crashed_planes(); });
     for (int i = 0; i <= 7; ++i)
     {
         GL::keystrokes.emplace('0'+i, [this, i]() { display_count_airline(i); });
@@ -64,6 +65,11 @@ void TowerSimulation::display_help() const
     }
 
     std::cout << std::endl;
+}
+
+void TowerSimulation::display_crashed_planes() const
+{
+    std::cout << aircraft_manager->get_crashed_planes() << " aircrafts have crashed" << std::endl;
 }
 
 void TowerSimulation::init_airport()

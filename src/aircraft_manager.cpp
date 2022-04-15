@@ -17,12 +17,13 @@ bool AircraftManager::update() {
         std::remove_if(
             aircrafts.begin(),
             aircrafts.end(),
-            [](auto& a) {
+            [this](auto& a) {
                 try {
                     bool result = a->update();
                     return !result;
                 } catch (const AircraftCrash &e) {
                     std::cerr << e.what() << std::endl;
+                    crashed_planes++;
                     return true;
                 }
             }),
@@ -50,4 +51,8 @@ int AircraftManager::get_required_fuel() const
         }
     }
     return sum;
+}
+int AircraftManager::get_crashed_planes() const
+{
+    return crashed_planes;
 }
