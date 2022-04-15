@@ -23,6 +23,18 @@ for (const auto& wp: control.get_instructions(*this))
 2. Modifiez `Aircraft::add_waypoint` afin que l'évaluation du flag ait lieu à la compilation et non à l'exécution.
 Que devez-vous changer dans l'appel de la fonction pour que le programme compile ?
 
+```cpp
+template <bool front>
+void add_waypoint(const Waypoint& wp);
+```
+
+```cpp
+for (const auto& wp: control.get_instructions(*this))
+{
+    add_waypoint<false>(wp);
+}
+```
+
 3. **BONUS** En utilisant [GodBolt](https://godbolt.org/), comparez le code-assembleur généré par les fonctions suivantes:
 <table border="0">
  <tr>
