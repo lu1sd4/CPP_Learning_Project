@@ -17,7 +17,15 @@ bool AircraftManager::update() {
         std::remove_if(
             aircrafts.begin(),
             aircrafts.end(),
-            [](auto& a) { return !a->update(); }),
+            [](auto& a) {
+                try {
+                    bool result = a->update();
+                    return !result;
+                } catch (const AircraftCrash &e) {
+                    std::cerr << e.what() << std::endl;
+                    return true;
+                }
+            }),
     aircrafts.end());
 
     return true;
