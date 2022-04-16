@@ -7,6 +7,20 @@
 #include <iostream>
 #include <numeric>
 
+template <int dimensions, class T>
+class Point
+{
+    T values[dimensions] {};
+    Point() {}
+    Point<dimensions, T>& operator+=(const Point<dimensions, T> other)
+    {
+        for (int i = 0; i < dimensions; ++i) {
+            values[i] += other.values[i];
+        }
+        return *this;
+    }
+};
+
 struct Point2D
 {
     float values[2] {};
