@@ -19,6 +19,38 @@ class Point
         }
         return *this;
     }
+    Point<dimensions, T>& operator*=(const Point<dimensions, T> other)
+    {
+        for (int i = 0; i < dimensions; ++i) {
+            values[i] *= other.values[i];
+        }
+        return *this;
+    }
+    Point<dimensions, T>& operator*=(const T& scalar)
+    {
+        for (int i = 0; i < dimensions; ++i) {
+            values[i] *= scalar;
+        }
+        return *this;
+    }
+    Point<dimensions, T>& operator+(const Point<dimensions, T>& other)
+    {
+        Point<dimensions, T> result = *this;
+        result += other;
+        return result;
+    }
+    Point<dimensions, T>& operator*(const Point<dimensions, T>& other)
+    {
+        Point<dimensions, T> result = *this;
+        result *= other;
+        return result;
+    }
+    Point<dimensions, T>& operator*(const T& scalar)
+    {
+        Point<dimensions, T> result = *this;
+        result *= scalar;
+        return result;
+    }
 };
 
 struct Point2D
