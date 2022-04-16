@@ -20,7 +20,7 @@ public:
     : values { x, y, z}
     {}
     template<typename... Args>
-    Point(Args&&... args)
+    explicit Point(Args&&... args)
     : values { std::forward<T>(static_cast<T>(args))... }
     {
         assert(sizeof...(args) == dimensions);
@@ -50,7 +50,7 @@ public:
     }
     T& z()
     {
-        static_assert(dimensions > 3);
+        static_assert(dimensions > 2);
         return values[2];
     }
     Point<dimensions, T>& operator+=(const Point<dimensions, T>& other)
