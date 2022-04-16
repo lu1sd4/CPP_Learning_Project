@@ -7,7 +7,7 @@
 #include <iostream>
 #include <numeric>
 
-template <int dimensions, typename T>
+template <size_t dimensions, typename T>
 class Point
 {
 public:
@@ -17,8 +17,14 @@ public:
     : values { x, y }
     {}
     Point(float x, float y, float z)
-        : values { x, y, z}
+    : values { x, y, z}
     {}
+    template<typename... Args>
+    Point(Args&&... args)
+    : values { std::forward<T>(static_cast<T>(args))... }
+    {
+        assert(sizeof...(args) == dimensions);
+    }
     T x() const
     {
         return values[0];
@@ -29,18 +35,22 @@ public:
     }
     T y() const
     {
+        static_assert(dimensions > 1);
         return values[1];
     }
     T& y()
     {
+        static_assert(dimensions > 1);
         return values[1];
     }
     T z() const
     {
+        static_assert(dimensions > 2);
         return values[2];
     }
     T& z()
     {
+        static_assert(dimensions > 3);
         return values[2];
     }
     Point<dimensions, T>& operator+=(const Point<dimensions, T>& other)
@@ -134,3 +144,12 @@ inline Point2D project_2D(const Point3D& p)
     return { .5f * p.x() - .5f * p.y(), .5f * p.x() + .5f * p.y() + p.z() };
 }
 
+//void test_generic_points()
+//{
+//
+//    Point<2, int> p1;
+//    Point<2, int> p2;
+//    auto p3 = p1 + p2;
+//    p1 += p2;
+//    p1 *= 3; // ou 3.f, ou 3.0 en fonction du type de Point
+//}

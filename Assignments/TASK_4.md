@@ -54,7 +54,7 @@ for (const auto& wp: control.get_instructions(*this))
 
 ### Objectif 2 - Points génériques
 
-1. Reprenez les classes dans `geometry.hpp` et inspirez-vous de `Point2D` et `Point3D` pour définir une unique classe-template `Point` paramétrée par la dimension (nombre de coordonnées) et leur type (entier/float/double).
+1. Reprenez les classes dans `geometry.hpp` et inspirez-vous de `Point2D` et `Point3D` pour définir une unique classe-template `Point` paramétrée par la dimensions (nombre de coordonnées) et leur type (entier/float/double).
 Pour ce qui est des constructeurs, vous n'ajouterez pour le moment que le constructeur par défaut.
 
 ```cpp
@@ -88,15 +88,26 @@ using Point3D = Point<3, float>;
 
 4. Dans la fonction `test_generic_points`, essayez d'instancier un `Point2D` avec 3 arguments.
 Que se passe-t-il ?
+
+erreur de compilation
+
 Comment pourriez-vous expliquer que cette erreur ne se produise que maintenant ?
 
+nous n'avons pas imposé des contraintes liées au nombre de dimensions dans le constructeur à 3 paramètres. 
+
 5. Que se passe-t-il maintenant si vous essayez d'instancier un `Point3D` avec 2 arguments ?
-Utilisez un `static_assert` afin de vous assurez que personne ne puisse initialiser un `Point3D` avec seulement deux éléments.
-Faites en de même dans les fonctions `y()` et `z()`, pour vérifier que l'on ne puisse pas les appeler sur des `Point` qui n'ont pas la dimension minimale requise.
+
+Utilisez un `static_assert` afin de vous assurer que personne ne puisse initialiser un `Point3D` avec seulement deux éléments.
+
+Faites en de même dans les fonctions `y()` et `z()`, pour vérifier que l'on ne puisse pas les appeler sur des `Point` qui n'ont pas la dimensions minimale requise.
+
+ok
 
 6. Plutôt qu'avoir un constructeur pour chaque cas possible (d'ailleurs, vous n'avez pas traité tous les cas possibles, juste 2D et 3D), vous allez utiliser un variadic-template et du perfect-forwarding pour transférer n'importe quel nombre d'arguments de n'importe quel type directement au constructeur de `values`.  
-Vous conserverez bien entendu le `static_assert` pour vérifier que le nombre d'arguments passés correspond bien à la dimension du `Point`.\
+Vous conserverez bien entendu le `static_assert` pour vérifier que le nombre d'arguments passés correspond bien à la dimensions du `Point`.\
 En faisant ça, vous aurez peut-être désormais des problèmes avec la copie des `Point`.
 Que pouvez-vous faire pour supprimer l'ambiguité ?
+
+faut mettre explicit
 
 7. **BONUS** En utilisant SFINAE, faites en sorte que le template `Point` ne puisse être instancié qu'avec des types [arithmétiques](https://en.cppreference.com/w/cpp/types/is_arithmetic).
