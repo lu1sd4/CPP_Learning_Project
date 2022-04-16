@@ -57,6 +57,14 @@ for (const auto& wp: control.get_instructions(*this))
 1. Reprenez les classes dans `geometry.hpp` et inspirez-vous de `Point2D` et `Point3D` pour définir une unique classe-template `Point` paramétrée par la dimension (nombre de coordonnées) et leur type (entier/float/double).
 Pour ce qui est des constructeurs, vous n'ajouterez pour le moment que le constructeur par défaut.
 
+```cpp
+class Point
+{
+    T values[dimensions] {};
+    Point() {}
+}
+```
+
 2. Ajoutez une fonction libre `test_generic_points` à votre programme, que vous appelerez depuis le `main`. 
 Placez le code suivant dans cette fonction et modifiez-le plusieurs fois, pour vérifier que le compilateur est capable de générer des classes à partir de votre template sans problème :
 ```cpp
@@ -70,6 +78,13 @@ p1 *= 3; // ou 3.f, ou 3.0 en fonction du type de Point
 3. Ajoutez le constructeur à 2 paramètres de `Point2D` et le constructeur à 3 paramètres de `Point3D` dans votre classe-template.
 Modifiez `Point2D` et `Point3D` afin d'en faire des alias sur des classes générées à partir du template `Point` (respectivement, 2 floats et 3 floats).
 Vérifiez que votre programme compile et fonctionne comme avant.
+
+```cpp
+
+using Point2D = Point<2, float>;
+using Point3D = Point<3, float>;
+
+```
 
 4. Dans la fonction `test_generic_points`, essayez d'instancier un `Point2D` avec 3 arguments.
 Que se passe-t-il ?
