@@ -12,31 +12,36 @@ class Point
 {
     T values[dimensions] {};
     Point() {}
-    Point<dimensions, T>& operator+=(const Point<dimensions, T> other)
+    Point<dimensions, T>& operator+=(const Point<dimensions, T>& other)
     {
-        for (int i = 0; i < dimensions; ++i) {
-            values[i] += other.values[i];
-        }
+        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::plus<>());
         return *this;
     }
-    Point<dimensions, T>& operator*=(const Point<dimensions, T> other)
+    Point<dimensions, T>& operator-=(const Point<dimensions, T>& other)
     {
-        for (int i = 0; i < dimensions; ++i) {
-            values[i] *= other.values[i];
-        }
+        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::minus<>());
+        return *this;
+    }
+    Point<dimensions, T>& operator*=(const Point<dimensions, T>& other)
+    {
+        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::multiplies<>());
         return *this;
     }
     Point<dimensions, T>& operator*=(const T& scalar)
     {
-        for (int i = 0; i < dimensions; ++i) {
-            values[i] *= scalar;
-        }
+        std::transform(values.begin(), values.end(), values.begin(), [&scalar](const T& value) { return scalar * value; });
         return *this;
     }
     Point<dimensions, T>& operator+(const Point<dimensions, T>& other)
     {
         Point<dimensions, T> result = *this;
         result += other;
+        return result;
+    }
+    Point<dimensions, T>& operator-(const Point<dimensions, T>& other)
+    {
+        Point<dimensions, T> result = *this;
+        result -= other;
         return result;
     }
     Point<dimensions, T>& operator*(const Point<dimensions, T>& other)
