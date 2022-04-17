@@ -8,6 +8,8 @@ Actuellement, quand un avion s'écrase, une exception de type `AircraftCrash` (q
 
 ---
 
+Dans le parcours des avions dans `AircraftManager::update`, en cas de `AircraftCrash` on peut supprimer l'avion comme suit :
+
 ```cpp
 [](auto& a) {
     try {
@@ -25,6 +27,8 @@ Actuellement, quand un avion s'écrase, une exception de type `AircraftCrash` (q
 2. Introduisez un compteur qui est incrémenté chaque fois qu'un avion s'écrase. Choisissez une touche du clavier qui n'a pas encore été utilisée (`m` par exemple ?) et affichez ce nombre dans la console lorsque l'utilisateur appuie dessus.
 
 ---
+
+Dans le même bout de code de la question précedente :
 
 ```cpp
     aircrafts.erase(
@@ -44,6 +48,8 @@ Actuellement, quand un avion s'écrase, une exception de type `AircraftCrash` (q
     aircrafts.end());
 ```
 
+Et dans `TowerSimulation` :
+
 ```cpp
 void TowerSimulation::display_crashed_planes() const
 {
@@ -56,11 +62,19 @@ int AircraftManager::get_crashed_planes() const
 }
 ```
 
+Et finalement, pour la touche :
+
+```cpp
+GL::keystrokes.emplace('m', [this]() { display_crashed_planes(); });
+```
+
 ---
 
 3. Si vous avez fini d'implémenter la gestion du kérosène (Task_2 - Objectif 2 - A), lancez une exception de type `AircraftCrash` lorsqu'un avion tombe à court d'esssence. Normalement, cette exception devrait être traitée de la même manière que lorsqu'un avion s'écrase parce qu'il a attérit trop vite.
 
 ---
+
+Dans `Aircraft::update` :
 
 ```cpp
 if (!is_at_terminal)
@@ -73,8 +87,6 @@ if (!is_at_terminal)
 ```
 
 ---
-
-4. **BONUS** Rédéfinissez `AircraftCrash` en tant que classe héritant de `std::runtime_error`, plutôt qu'en tant qu'alias. Arrangez-vous pour que son constructeur accepte le numéro de vol, la position, la vitesse de l'avion au moment du crash, et la raison du crash (`"out of fuel"` / `"bad landing"`). Vous utiliserez toutes ces informations pour générer le joli message de l'exception.
 
 ## Objectif 2 - Détecter les erreurs de programmation
 
