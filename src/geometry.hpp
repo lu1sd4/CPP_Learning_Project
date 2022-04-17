@@ -6,8 +6,13 @@
 #include <cmath>
 #include <iostream>
 #include <numeric>
+#include <type_traits>
 
-template <size_t dimensions, typename T>
+template <
+    size_t dimensions,
+    typename T,
+    typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+>
 class Point
 {
 public:
@@ -15,10 +20,14 @@ public:
     Point() {};
     Point(float x, float y)
     : values { x, y }
-    {}
+    {
+        static_assert(dimensions == 2);
+    }
     Point(float x, float y, float z)
     : values { x, y, z}
-    {}
+    {
+        static_assert(dimensions == 3);
+    }
     template<typename... Args>
     explicit Point(Args&&... args)
     : values { std::forward<T>(static_cast<T>(args))... }
@@ -144,12 +153,15 @@ inline Point2D project_2D(const Point3D& p)
     return { .5f * p.x() - .5f * p.y(), .5f * p.x() + .5f * p.y() + p.z() };
 }
 
-//void test_generic_points()
-//{
-//
-//    Point<2, int> p1;
-//    Point<2, int> p2;
-//    auto p3 = p1 + p2;
-//    p1 += p2;
-//    p1 *= 3; // ou 3.f, ou 3.0 en fonction du type de Point
-//}
+inline void test_generic_points()
+{
+
+    Point<2, int> p1;
+    Point<2, int> p2;
+    auto p3 = p1 + p2;
+    p1 += p2;
+    p1 *= 3; // ou 3.f, ou 3.0 en fonction du type de Point
+    std::cout << p3.x() << std::endl;
+//    Point<3, std::string> p = {"a", "b", "c"};
+//    std::cout << p.x() << std::endl;
+}
