@@ -11,6 +11,7 @@ class AircraftFactory
 public:
     std::unique_ptr<Aircraft> with_airport(Airport* airport)
     {
+        assert(airport);
         std::string flight_number;
         do {
             flight_number = airlines[std::rand() % 8] + std::to_string(1000 + (rand() % 9000));

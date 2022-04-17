@@ -1,0 +1,98 @@
+\documentclass{article}
+\usepackage{enumitem}
+\usepackage{concmath-otf}
+\renewcommand{\baselinestretch}{1.5}
+
+\begin{document}
+
+\begin{center}
+  \textsc{\LARGE C++} \\[0.5cm]
+  \textsc{\large M1 Informatique} \\[2cm]
+
+
+  { \large \bfseries Tower Control Simulation : Rapport }
+
+  \vfill
+
+  \large Luis Daniel Medina Zuluaga\\[0.5cm]
+  \large Avril 2022
+\end{center}
+
+\pagebreak
+
+
+\section{Les questions non-code}
+
+Les réponses aux questions « non-code » (et aussi à celles de « code ») se trouvent dans les fichiers \texttt{Task\_0.md}, \texttt{Task\_1.md}, \texttt{Task\_2.md}, \texttt{Task\_3.md} et \texttt{Task\_4.md}.
+
+\section{Les choix d'architecture du programme}
+
+Étant donné que le point de départ était un projet fonctionnel, et que les questions posées dans les « \textit{Task} » nous dictaient la façon dont on devait procéder en termes d'architecture ou amenaient à des changements d'implémentation sans introduire des besoins implicites de changement sctructurel, je trouve que la plupart des choix d'architecture étaient déjà faites, comprenant :
+
+\begin{itemize}[noitemsep]
+\item des classes ayant certaines responsabilités
+\item une interface avec \texttt{OpenGL}
+\item centralisation de la configuration pour éviter les \textit{magic numbers}
+\item une hiérarchie de classes commençant par \texttt{Displayable} et \texttt{Dynamic Object} permettant de séparer la logique d'affichage de celle liée à la simulation en tant que telle
+\item une modélisation concrète de tout le scénario simulé.
+\item le choix d'une \textit{Factory} pour les avions.
+\item l'introduction de certains attributs/fonctions-membre
+\end{itemize}
+
+Cela dit, voici quelques choix de structures de données et de fonctions de la librairie standard que j'ai dû faire pour l'implémentation de certaines tâches :
+
+\subsection*{Task 1}
+
+\subsubsection*{\textbf{Objectif 1 - \texttt{AircraftManager}}}
+
+Pour stocker des pointeurs vers les avions créés, j'ai choisi d'utiliser \texttt{std::vector} en me disant que peut-être il y aurait besoin de les avoir dans un ordre spécifique plus tard. Et j'avais raison, nous en avons besoin pour l'objectif 2 de la \textit{Task 2}.
+
+\subsubsection*{\textbf{Objectif 2 - \texttt{AircraftFactory}}}
+
+J'ai choisi de rendre la méthode de création des avions \texttt{static}, suivant le patron \textit{factory}, vu que dans cette instance, on n'a pas besoin d'avoir un état pour la \textit{factory}.
+
+\subsection*{Task 2}
+
+\subsubsection*{\textbf{Objectif 1 - B}}
+
+J'ai choisi d'utiliser, en plus de \texttt{std::remove\_if}, la fonction-membre \texttt{erase} de \texttt{std::vector}, cela fait un code compact et compréhensible.
+
+\subsubsection*{\textbf{Objectif 1 - C}}
+
+J'ai choisi d'utiliser \texttt{std::transform}, cela permet de faire la même opération sur les éléments un rang de valeurs d'une structure itérable d'un coup, et même d'en faire des opérations binaires élément par élément avec une autre structure, donc cela m'a semblé le plus adapté pour ce qui est demandé.
+
+\subsubsection*{\textbf{Objectif 2 - A}}
+
+J'ai choisi d'utiliser \texttt{std::random\_device} et \texttt{std::uniform\_int\_distribution}, car combinées, ces structures me semblaient produire le code le plus lisible parmi toutes les options que j'ai trouvé.
+
+\subsubsection*{\textbf{Objectif 2 - B}}
+
+J'ai choisi d'utiliser \texttt{std::copy} avec \texttt{std::back\_inserter} parce que cela permet de mettre tous les éléments du chemin donné à la fin de la queue d'une façon très propre et lisible. On insère tous les éléments de \texttt{path\_to\_terminal} à la fin (donc \textbf{back}-inserter) de \texttt{waypoints}.
+
+\subsubsection*{\textbf{Objectif 2 - C}}
+
+J'ai choisi de trier les avions en utilisant \texttt{std::sort} au lieu d'implémenter mon propre algorithme de tri.
+
+\subsubsection*{\textbf{Objectif 2 - D}}
+
+Pour calculer l'essence manquante, j'ai utilisé \texttt{std::accumulate}, qui permet de parcourir toute la structure itérable en accumulant un résultat avec un opérateur qui prend la valeur cumulée et l'élément courant.
+
+\section{Questions difficiles}
+
+La seule question où j'ai vraiment eu du mal à m'en sortir avec ce que j'avais vu en cours et appris dans la doc, c'était la toute dernière : \textbf{Task 4 - Objectif 1 - Point 6}, où il fallait utiliser des notions que je n'avais pas suffisamment saisies, comme les \textit{variadic-templates} et le \textit{perfect-forwarding}.
+
+Finalement, avec un peu de recherche sur \textit{stack overflow} j'ai pu trouver le bon chemin. La solution était de faire un \texttt{std::cast} dans \texttt{std::forward} avant de faire la \textit{pack expansion} pour arriver à \textit{forward} au constructeur de \texttt{std::array} les paramètres du bon type.
+
+\section{Appréciations}
+
+\subsection*{Ce que j'ai aimé}
+
+J'aime bien le principe de partir d'un projet déjà fait parce que cela nous prépare en tant que développeurs à ce qui va sûrement faire partie de la plupart de nos tâches : décrypter du code que l'on ne trouve pas parfait, et qui a été fait pour quelqu'un d'autre pour ensuite en faire des améliorations ou des changements.
+
+\subsection*{Ce que j'ai détesté}
+
+J'ai moins bien apprécié, d'une part, le déroulement des tâches dans le projet, dans lequel je me retrouvais à faire des changements qui ne donnaient pas l'impression d'avancer, ni dans le projet, ni dans l'apprentissage du langage. Le changement le plus visible que l'on nous a demandé de faire, c'était d'ajouter des touches pour afficher des messages dans la console. Si l'on exécute le programme avant et après de compléter les tâches du projet, on a donc l'impression que rien n'a changé. J'aurais plutôt préféré d'ajouter des nouvelles \textit{features}. 
+
+D'une autre part, le fait de devoir, sous indication de l'énoncé, faire une tâche d'une certaine manière pour ensuite devoir revenir en arrière et le réimplémenter de la « bonne façon » est assez décourageant, car on a l'impression de devoir désapprendre des choses que l'on vient de découvrir, et cela cause plutôt de la confusion.
+
+\end{document}

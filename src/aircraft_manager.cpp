@@ -34,6 +34,7 @@ bool AircraftManager::update() {
 
 void AircraftManager::add_aircraft(std::unique_ptr<Aircraft> aircraft)
 {
+    assert(aircraft);
     aircrafts.emplace_back(std::move(aircraft));
 }
 int AircraftManager::count_in_airline(const std::string& airline) const
@@ -49,6 +50,7 @@ int AircraftManager::get_required_fuel() const
         aircrafts.end(),
         0,
         [](int sum, const std::unique_ptr<Aircraft>& aircraft) {
+            assert(aircraft);
             if (aircraft->is_low_on_fuel() && !aircraft->has_been_serviced) {
                 return sum + (3000 - aircraft->fuel);
             }

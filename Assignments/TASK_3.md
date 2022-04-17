@@ -28,7 +28,7 @@ Dans le parcours des avions dans `AircraftManager::update`, en cas de `AircraftC
 
 ---
 
-Dans le même bout de code de la question précedente :
+Dans le même bout de code de la question précédente, j'incrémente le compteur :
 
 ```cpp
     aircrafts.erase(
@@ -70,7 +70,7 @@ GL::keystrokes.emplace('m', [this]() { display_crashed_planes(); });
 
 ---
 
-3. Si vous avez fini d'implémenter la gestion du kérosène (Task_2 - Objectif 2 - A), lancez une exception de type `AircraftCrash` lorsqu'un avion tombe à court d'esssence. Normalement, cette exception devrait être traitée de la même manière que lorsqu'un avion s'écrase parce qu'il a attérit trop vite.
+3. Si vous avez fini d'implémenter la gestion du kérosène (Task_2 - Objectif 2 - A), lancez une exception de type `AircraftCrash` lorsqu'un avion tombe à court d'essence. Normalement, cette exception devrait être traitée de la même manière que lorsqu'un avion s'écrase parce qu'il a atterri trop vite.
 
 ---
 
@@ -115,5 +115,7 @@ void Aircraft::arrive_at_terminal()
     is_at_terminal = true;
 }
 ```
+
+Des assertions sur les pointeurs...
 
 ---
