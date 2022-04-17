@@ -44,13 +44,17 @@ int AircraftManager::count_in_airline(const std::string& airline) const
 }
 int AircraftManager::get_required_fuel() const
 {
-    int sum = 0;
-    for (const auto& aircraft: aircrafts) {
-        if (aircraft->is_low_on_fuel() && !aircraft->has_been_serviced) {
-            sum += (3000 - aircraft->fuel);
+    return std::accumulate(
+        aircrafts.begin(),
+        aircrafts.end(),
+        0,
+        [](int sum, const std::unique_ptr<Aircraft>& aircraft) {
+            if (aircraft->is_low_on_fuel() && !aircraft->has_been_serviced) {
+                return sum + (3000 - aircraft->fuel);
+            }
+            return sum;
         }
-    }
-    return sum;
+   );
 }
 int AircraftManager::get_crashed_planes() const
 {

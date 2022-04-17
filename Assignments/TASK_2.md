@@ -7,12 +7,16 @@
 `TowerSimulation::display_help()` est chargé de l'affichage des touches disponibles.
 Dans sa boucle, remplacez `const auto& ks_pair` par un structured binding adapté.
 
+---
+
 ```cpp
 for (const auto& [ key, action ] : GL::keystrokes)
 {
     std::cout << key << ' ';
 }
 ```
+
+---
 
 ### B - Algorithmes divers
 
@@ -21,6 +25,10 @@ En pratique, il y a des opportunités pour des pièges ici. Pour les éviter, `<
 Remplacez votre boucle avec un appel à `std::remove_if`.
 
 **Attention**: pour cela c'est necessaire que `AircraftManager` stocke les avion dans un `std::vector` ou `std::list` (c'est déjà le cas pour la solution filé).
+
+---
+
+Voici `bool AircraftManager::update()` après les changements.
 
 ```cpp
 bool AircraftManager::update() {
@@ -34,9 +42,15 @@ bool AircraftManager::update() {
 }
 ```
 
+---
+
 2. Pour des raisons de statistiques, on aimerait bien être capable de compter tous les avions de chaque airline.
 A cette fin, rajoutez des callbacks sur les touches `0`..`7` de manière à ce que le nombre d'avions appartenant à `airlines[x]` soit affiché en appuyant sur `x`.
 Rendez-vous compte de quelle classe peut acquérir cet information. Utilisez la bonne fonction de `<algorithm>` pour obtenir le résultat.
+
+---
+
+On ajoute une fonction-membre publique dans `AircraftManager` :
 
 ```cpp
 int AircraftManager::count_in_airline(const std::string& airline) const
@@ -47,6 +61,8 @@ int AircraftManager::count_in_airline(const std::string& airline) const
 }
 ```
 
+Et également dans `TowerSimulation` :
+
 ```cpp
 void TowerSimulation::display_count_airline(const int& airline_index) const
 {
@@ -54,6 +70,18 @@ void TowerSimulation::display_count_airline(const int& airline_index) const
     std::cout << aircraft_manager->count_in_airline(airline_name) << " aircrafts in " << airline_name << std::endl;
 }
 ```
+
+Et finalement, pour les nouvelles touches :
+
+```cpp
+GL::keystrokes.emplace('m', [this]() { display_crashed_planes(); });
+for (int i = 0; i <= 7; ++i)
+{
+    GL::keystrokes.emplace('0'+i, [this, i]() { display_count_airline(i); });
+}
+```
+
+---
 
 ### C - Relooking de Point3D
 
@@ -68,7 +96,8 @@ remplacez le code des fonctions suivantes en utilisant des fonctions de `<algori
 
 ---
 
-Operator `*=`
+Operator `*=` :
+
 ```cpp
 Point3D& operator*=(const float scalar)
 {
@@ -77,7 +106,8 @@ Point3D& operator*=(const float scalar)
 }
 ```
 
-Operator `+=` et `-=`
+Operator `+=` et `-=` :
+
 ```cpp
 Point3D& operator+=(const Point3D& other)
 {
@@ -92,7 +122,8 @@ Point3D& operator-=(const Point3D& other)
 }
 ```
 
-`Point3D::length() const`
+`float Point3D::length() const` :
+
 ```cpp
 float length() const {
     return std::sqrt(std::accumulate(values.begin(), values.end(), 0., [](const auto& acc, const auto& current) { return acc + current * current; }));
@@ -112,18 +143,25 @@ Ajoutez un attribut `fuel` à `Aircraft`, et initialisez-le à la création de c
 Décrémentez cette valeur dans `Aircraft::update` si l'avion est en vol.\
 Lorsque cette valeur atteint 0, affichez un message dans la console pour indiquer le crash, et faites en sorte que l'avion soit supprimé du manager.
 
-N'hésitez pas à adapter la borne `150` - `3'000`, de manière à ce que des avions se crashent de temps en temps.
+N'hésitez pas à adapter la borne `150` - `3'000`, de manière que des avions se crashent de temps en temps.
 
 ---
 
-Dans le constructeur
+Dans `aircraft.hpp` :
+
+```cpp
+#include <random>
+```
+
+Dans le constructeur, pour les nombres aléatoires :
+
 ```cpp
 std::random_device rd;
 std::uniform_int_distribution<int> dist(150, 3000);
 fuel = dist(rd);
 ```
 
-Dans update
+Dans `Aircraft::update` :
 
 ```cpp
 fuel--;
@@ -133,6 +171,8 @@ if (fuel <= 0) {
 }
 ```
 
+---
+
 ### B - Un terminal s'il vous plaît
 
 Afin de minimiser les crashs, il va falloir changer la stratégie d'assignation des terminaux aux avions.
@@ -141,16 +181,9 @@ Si un terminal est libre, la tour lui donne le chemin pour l'atteindre, sinon, e
 Pour pouvoir prioriser les avions avec moins d'essence, il faudrait déjà que les avions tentent de réserver un terminal tant qu'ils n'en n'ont pas (au lieu de ne demander que lorsqu'ils ont terminé leur petit tour).
 
 1. Introduisez une fonction `bool Aircraft::has_terminal() const` qui indique si un terminal a déjà été réservé pour l'avion (vous pouvez vous servir du type de `waypoints.back()`).
-2. Ajoutez une fonction `bool Aircraft::is_circling() const` qui indique si l'avion attend qu'on lui assigne un terminal pour pouvoir attérir.
-3. Introduisez une fonction `WaypointQueue Tower::reserve_terminal(Aircraft& aircraft)` qui essaye de réserver un `Terminal`. Si c'est possible, alors elle retourne un chemin vers ce `Terminal`, et un chemin vide autrement (vous pouvez vous inspirer / réutiliser le code de `Tower::get_instructions`).
-4. Modifiez la fonction `move()` (ou bien `update()`) de `Aircraft` afin qu'elle appelle `Tower::reserve_terminal` si l'avion est en attente. Si vous ne voyez pas comment faire, vous pouvez essayer d'implémenter ces instructions :\
-\- si l'avion a terminé son service et sa course, alors on le supprime de l'aéroport (comme avant),\
-\- si l'avion attend qu'on lui assigne un terminal, on appelle `Tower::reserve_terminal` et on modifie ses `waypoints` si le terminal a effectivement pu être réservé,\
-\- si l'avion a terminé sa course actuelle, on appelle `Tower::get_instructions` (comme avant).
 
 ---
 
-1. 
 ```cpp
 bool Aircraft::has_terminal() const
 {
@@ -158,7 +191,12 @@ bool Aircraft::has_terminal() const
 }
 ```
 
-2.
+---
+
+2. Ajoutez une fonction `bool Aircraft::is_circling() const` qui indique si l'avion attend qu'on lui assigne un terminal pour pouvoir attérir.
+
+---
+
 ```cpp
 bool Aircraft::is_circling() const
 {
@@ -166,7 +204,32 @@ bool Aircraft::is_circling() const
 }
 ```
 
-3.
+---
+
+3. Introduisez une fonction `WaypointQueue Tower::reserve_terminal(Aircraft& aircraft)` qui essaye de réserver un `Terminal`. Si c'est possible, alors elle retourne un chemin vers ce `Terminal`, et un chemin vide autrement (vous pouvez vous inspirer / réutiliser le code de `Tower::get_instructions`).
+
+---
+
+Dans `Tower` :
+
+```cpp
+WaypointQueue Tower::reserve_terminal(Aircraft& aircraft)
+{
+    const auto vp = airport.reserve_terminal(aircraft);
+    if (!vp.first.empty())
+    {
+        reserved_terminals[&aircraft] = vp.second;
+        return vp.first;
+    }
+    else
+    {
+        return {};
+    }
+}
+```
+
+Et dans `Aircraft::update` :
+
 ```cpp
 if (waypoints.empty()) {
     if (has_been_serviced)
@@ -187,7 +250,17 @@ if (!has_terminal() && is_circling())
 }
 ```
 
-4.
+---
+
+4. Modifiez la fonction `move()` (ou bien `update()`) de `Aircraft` afin qu'elle appelle `Tower::reserve_terminal` si l'avion est en attente. Si vous ne voyez pas comment faire, vous pouvez essayer d'implémenter ces instructions :\
+\- si l'avion a terminé son service et sa course, alors on le supprime de l'aéroport (comme avant),\
+\- si l'avion attend qu'on lui assigne un terminal, on appelle `Tower::reserve_terminal` et on modifie ses `waypoints` si le terminal a effectivement pu être réservé,\
+\- si l'avion a terminé sa course actuelle, on appelle `Tower::get_instructions` (comme avant).
+
+---
+
+Dans `Aircraft::update` :
+
 ```cpp
 if (!has_terminal() && is_circling())
 {
@@ -199,6 +272,8 @@ if (!has_terminal() && is_circling())
     }
 }
 ```
+
+---
 
 ### C - Minimiser les crashs
 
@@ -232,6 +307,8 @@ Au début de la fonction `AircraftManager::move` (ou `update`), ajoutez les inst
 
 ----
 
+Pour le comparateur, je regarde d'abord si l'avion a un terminal et ensuite je compare les valeurs de `fuel` des deux avions.
+
 ```cpp
 bool AircraftManager::update() {
     std::sort(
@@ -246,6 +323,8 @@ bool AircraftManager::update() {
     ...
 ```
 
+---
+
 ### D - Réapprovisionnement 
 
 Afin de pouvoir repartir en toute sécurité, les avions avec moins de `200` unités d'essence doivent être réapprovisionnés par l'aéroport pendant qu'ils sont au terminal.
@@ -256,6 +335,17 @@ Testez votre programme pour vérifier que certains avions attendent bien indéfi
 Si ce n'est pas le cas, essayez de faire varier la constante `200`.
 
 ---
+
+Voici ma fonction `Aircraft::is_low_on_fuel` :
+
+```cpp
+bool is_low_on_fuel() const
+{
+    return fuel < 200;
+}
+```
+
+Et un appel à `Aircraft::is_low_on_fuel` dans `Terminal::update`
 
 ```cpp
 bool update() override
@@ -279,13 +369,17 @@ bool update() override
 ```cpp
 int AircraftManager::get_required_fuel() const
 {
-    int sum = 0;
-    for (const auto& aircraft: aircrafts) {
-        if (aircraft->is_low_on_fuel() && !aircraft->has_been_serviced) {
-            sum += (3000 - aircraft->fuel);
+    return std::accumulate(
+        aircrafts.begin(),
+        aircrafts.end(),
+        0,
+        [](int sum, const std::unique_ptr<Aircraft>& aircraft) {
+            if (aircraft->is_low_on_fuel() && !aircraft->has_been_serviced) {
+                return sum + (3000 - aircraft->fuel);
+            }
+            return sum;
         }
-    }
-    return sum;
+   );
 }
 ```
 
@@ -390,6 +484,17 @@ Pour garantir cela, vous allez modifier le destructeur de `Aircraft`. Si l'avion
 
 ---
 
+On ajoute la fonction `Terminal::release`
+
+```cpp
+void release()
+{
+    current_aircraft = nullptr;
+}
+```
+
+Et dans `Tower` :
+
 ```cpp
 void Tower::release_terminal(Aircraft& aircraft)
 {
@@ -402,17 +507,15 @@ void Tower::release_terminal(Aircraft& aircraft)
 }
 ```
 
+Et finalement dans le destructeur de `Aircraft` :
+
+```cpp
+~Aircraft()
+{
+    if (has_terminal()) {
+        control.release_terminal(*this);
+    }
+}
+```
+
 ---
-
-### F - Paramétrage (optionnel)
-
-Pour le moment, tous les avions ont la même consommation d'essence (1 unité / trame) et la même taille de réservoir (`3'000`).
-
-1. Arrangez-vous pour que ces deux valeurs soient maintenant déterminées par le type de chaque avion (`AircraftType`).
-
-2. Pondérez la consommation réelle de l'avion par sa vitesse courante.
-La consommation définie dans `AircraftType` ne s'appliquera que lorsque l'avion est à sa vitesse maximale.
-
-3. Un avion indique qu'il a besoin d'essence lorsqu'il a moins de `200` unités.
-Remplacez cette valeur pour qu'elle corresponde à la quantité consommée en 10s à vitesse maximale.\
-Si vous n'avez pas fait la question bonus de TASK_0, notez bien que la fonction `update` de chaque avion devrait être appelée `DEFAULT_TICKS_PER_SEC` fois par seconde. 
