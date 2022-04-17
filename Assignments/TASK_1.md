@@ -11,6 +11,8 @@ Si à un moment quelconque du programme, vous souhaitiez accéder à l'avion aya
 
 Je pourrais le chercher dans la `move_queue` ou la `display_queue`.
 
+---
+
 ## Objectif 1 - Référencement des avions
 
 ### A - Choisir l'architecture
@@ -33,23 +35,62 @@ Il serait donc bon de savoir qui est censé détruire les avions du programme, a
 Répondez aux questions suivantes :
 1. Qui est responsable de détruire les avions du programme ? (si vous ne trouvez pas, faites/continuez la question 4 dans TASK_0)
 
-`opengl_interface` lorsqu'un avion a été desservi et qu'il n'est plus au terminal.
+---
+
+En ce moment, cela est fait dans `GL::timer` lorsqu'un avion a été desservi et qu'il n'est plus dans le terminal :
+
+```cpp
+void timer(const int step)
+{
+    if (running)
+    {
+        for (auto it = move_queue.begin(); it != move_queue.end();)
+        {
+            auto* item = *it;
+            if (item->update())
+            {
+                ++it;
+            }
+            else
+            {
+                it = move_queue.erase(it);
+                delete item;
+            }
+        }
+    }
+    glutPostRedisplay();
+    glutTimerFunc(1000u / ticks_per_sec, timer, step + 1);
+}
+```
+
+---
 
 2. Quelles autres structures contiennent une référence sur un avion au moment où il doit être détruit ?
 
+---
+
 `Displayable::display_queue` est de type `std::vector<const Displayable*>`
 `DynamicObject::move_queue` est de type `std::unordered_set<DynamicObject*>`
-`Terminal::current_aircraft` est de type `Aircraft*`
-`Tower::reserved_terminals` est de type `std::map<const Aircraft*, size_t>`
+
+---
 
 3. Comment fait-on pour supprimer la référence sur un avion qui va être détruit dans ces structures ?
 
+---
+
 On utilise la fonction `erase` des conteneurs quand il faut supprimer l'avion du programme.
-D'abord dans la boucle sur `move_queue` et dans le destructeur de `Displayable` pour `display_queue`
+
+D'abord dans la boucle, pour le supprimer de `move_queue` et ensuite dans le destructeur de `Displayable`, pour le supprimer de `display_queue`
+
+---
 
 4. Pourquoi n'est-il pas très judicieux d'essayer d'appliquer la même chose pour votre `AircraftManager` ?
 
-Je sais pas ?
+---
+
+Parce que l'on peut faire mieux avec des smart pointers.
+
+---
 
 Pour simplifier le problème, vous allez déplacer l'ownership des avions dans la classe `AircraftManager`.
 Vous allez également faire en sorte que ce soit cette classe qui s'occupe de déplacer les avions, et non plus la fonction `timer`.
@@ -69,7 +110,7 @@ Testez que le programme fonctionne toujours.
 
 ---
 
-j'ai une classe AircraftManager :
+Voici ma classe AircraftManager :
 
 ```cpp
 class AircraftManager : public GL::DynamicObject
@@ -82,7 +123,7 @@ public:
 };
 ```
 
-À l'initialisation de l'aéroport, on cree le `AircraftManager` et on l'ajoute à la `move_queue` :
+À l'initialisation de l'aéroport, je crée le `AircraftManager` et je l'ajoute à la `move_queue` :
 
 ```cpp
 void TowerSimulation::init_airport()
@@ -96,13 +137,13 @@ void TowerSimulation::init_airport()
 }
 ```
 
-Et à la création des avions, on les ajoute dans l'AircraftManager :
+Et à la création des avions, je les ajoute dans AircraftManager :
 
 ```cpp
 aircraft_manager->add_aircraft(std::make_unique<Aircraft>(type, flight_number, start, direction, airport->get_tower()));
 ```
 
-Il n'y a plus besoin de gérer la suppression des avions dans le timer :
+Comme ça, je n'ai plus besoin de gérer la suppression des avions dans le timer :
 
 ```cpp
 for (auto dynamic_object : move_queue)
@@ -125,6 +166,10 @@ Pour éviter l'usage de variables globales, vous allez créer une classe `Aircra
 
 Définissez cette classe, instanciez-la à l'endroit qui vous paraît le plus approprié, et refactorisez le code pour l'utiliser.
 Vous devriez du coup pouvoir supprimer les variables globales `airlines` et `aircraft_types`.
+
+---
+
+Voici ma classe AircraftFactory :
 
 ```cpp
 #pragma once
@@ -155,11 +200,17 @@ private:
 };
 ```
 
+---
+
 ### B - Conflits
 
 Il est rare, mais possible, que deux avions soient créés avec le même numéro de vol.
 Ajoutez un conteneur dans votre classe `AircraftFactory` contenant tous les numéros de vol déjà utilisés.
 Faites maintenant en sorte qu'il ne soit plus possible de créer deux fois un avion avec le même numéro de vol.
+
+---
+
+Pour cela, j'ai choisi de garder un `std::set` des numéros de vol et de regarder si le numéro de vol generé est présent dans ce `std::set` à chaque fois que je crée un avion.  
 
 ```cpp
 private:
@@ -175,32 +226,4 @@ std::unique_ptr<Aircraft> with_airport(Airport* airport)
 }
 ```
 
-### C - Data-driven AircraftType (optionnel)
-
-On aimerait pouvoir charger les paramètres des avions depuis un fichier.
-
-Définissez un format de fichier qui contiendrait les informations de chaque `AircraftType` disponible dans le programme.\
-Ajoutez une fonction `AircraftFactory::LoadTypes(const MediaPath&)` permettant de charger ce fichier.
-Les anciens `AircraftTypes` sont supprimés.
-
-Modifiez ensuite le `main`, afin de permettre à l'utilisateur de passer le chemin de ce fichier via les paramètres du programme.
-S'il ne le fait pas, on utilise la liste de type par défaut.
-
-Si vous voulez de nouveaux sprites, vous pouvez en trouver sur [cette page](http://www.as-st.com/ttd/planes/planes.html)
-(un peu de retouche par GIMP est necessaire)
-
 ---
-
-## Objectif 3 - Pool de textures (optionnel)
-
-Pour le moment, chacun des `AircraftType` contient et charge ses propres sprites.
-On pourrait néanmoins avoir différents `AircraftType` qui utilisent les mêmes sprites.
-Ils seraient donc chargés plusieurs fois depuis le disque pour rien.
-
-Pour rendre le programme un peu plus performant, implémentez une classe `TexturePool` qui s'occupe de charger, stocker et fournir les textures.
-Réfléchissez bien au type que vous allez utiliser pour référencer les textures, afin d'exprimer correctement l'ownership.
-
-Listez les classes qui ont besoin de `TexturePool`.
-Sachant que vous n'aurez qu'une seule instance de `TexturePool` dans votre programme, quelle classe devra assumer l'ownership de cet objet ?\
-Instanciez `TexturePool` au bon endroit et refactorisez le code afin que tous les chargements de textures utilisent ce nouvel objet.
-Assurez-vous que votre implémentation ne génère pas des fuites de mémoire au moment de sa destruction.

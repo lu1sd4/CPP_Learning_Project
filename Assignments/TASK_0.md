@@ -517,19 +517,7 @@ void timer(const int step)
 {
     if (running)
     {
-        for (auto it = move_queue.begin(); it != move_queue.end();)
-        {
-            auto* item = *it;
-            if (item->update())
-            {
-                ++it;
-            }
-            else
-            {
-                it = move_queue.erase(it);
-                delete item;
-            }
-        }
+        // ...
     }
     glutPostRedisplay();
     glutTimerFunc(1000u / ticks_per_sec, timer, step + 1);
